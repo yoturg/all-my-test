@@ -1,5 +1,5 @@
 import './style.css'
-import { getState, subscribe, add } from './redux/test'
+import { getState, subscribe, add, sub, action } from './redux/test'
 import { createStore } from './redux'
 
 
@@ -7,17 +7,23 @@ import { createStore } from './redux'
 
 const Dtimes = document.createElement('h1')
 Dtimes.innerHTML = getState()
-const Dbtn = document.createElement('button')
-Dbtn.innerHTML = '+1'
+const Daddbtn = document.createElement('button')
+Daddbtn.innerHTML = '+1'
 
-Dbtn.addEventListener('click', add)
+const Dsubbtn = document.createElement('button')
+Dsubbtn.innerHTML = '-1'
 
-subscribe((state) => {
-  Dtimes.innerHTML = state
+// Daddbtn.addEventListener('click', add)
+// Dsubbtn.addEventListener('click', sub)
+Daddbtn.addEventListener('click', () => {action('add')})
+Dsubbtn.addEventListener('click', () => {action('sub')})
+
+subscribe(() => {
+  Dtimes.innerHTML = getState()
 })
 
 
 const Dapp = document.querySelector('#app')
-;[Dtimes, Dbtn].forEach(v => {
+;[Dtimes, Daddbtn, Dsubbtn].forEach(v => {
   Dapp.appendChild(v)
 })

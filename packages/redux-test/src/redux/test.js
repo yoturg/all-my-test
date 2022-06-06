@@ -8,7 +8,25 @@ const getState = () => {
 const add = () => {
   times++
   listener.forEach(v => {
-    v(times)
+    v()
+  })
+}
+
+const sub = () => {
+  times--
+  listener.forEach(v => {
+    v()
+  })
+}
+
+const action = (type) => {
+  if(type === 'add') {
+    times++
+  } else if(type === 'sub') {
+    times--
+  }
+  listener.forEach(v => {
+    v()
   })
 }
 
@@ -22,5 +40,7 @@ const subscribe = (fn) => {
 export {
   getState,
   subscribe,
-  add
+  add,
+  sub,
+  action
 }
