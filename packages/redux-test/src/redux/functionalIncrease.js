@@ -17,8 +17,27 @@ function createStore(reducer) {
   }
 
   function dispatch(action) {
+    
     state = reducer(state, action)
     listeners.forEach(v => v())
+    return state
+  }
+
+  function dispatch1(action) {
+    const prevState = state
+    const nextState = dispatch(action)
+    console.log('prev state', prevState)
+    console.log('action', action)
+    console.log('next state', nextState, '\n\n')
+    return nextState
+  }
+
+  function dispatch2(action) {
+    if(typeof action === 'function') {
+      action(dispatch2)
+    } else {
+      return dispatch1(action)
+    }
   }
 
   function getState() {
@@ -28,8 +47,10 @@ function createStore(reducer) {
 
   return {
     subscribe,
+    getState,
     dispatch,
-    getState
+    dispatch1,
+    dispatch2
   }
 }
 
