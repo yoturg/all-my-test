@@ -1,8 +1,1 @@
-
-function createStore() {
-
-}
-
-export {
-  createStore
-}
+import {Store, StoreData} from './calssial'

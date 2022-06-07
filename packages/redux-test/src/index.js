@@ -1,12 +1,15 @@
 import './style.css'
 import { getState, subscribe, add, sub, action } from './redux/test'
-import { createStore } from './redux'
+// import { store } from './redux/classial'
+
+import { store } from './redux/functional'
+// import { createStore } from './redux'
+
 
 
 
 
 const Dtimes = document.createElement('h1')
-Dtimes.innerHTML = getState()
 const Daddbtn = document.createElement('button')
 Daddbtn.innerHTML = '+1'
 
@@ -15,11 +18,23 @@ Dsubbtn.innerHTML = '-1'
 
 // Daddbtn.addEventListener('click', add)
 // Dsubbtn.addEventListener('click', sub)
-Daddbtn.addEventListener('click', () => {action('add')})
-Dsubbtn.addEventListener('click', () => {action('sub')})
 
-subscribe(() => {
-  Dtimes.innerHTML = getState()
+// 原生
+// Dtimes.innerHTML = getState()
+// Daddbtn.addEventListener('click', () => {action('add')})
+// Dsubbtn.addEventListener('click', () => {action('sub')})
+
+// subscribe(() => {
+//   Dtimes.innerHTML = getState()
+// })
+
+// 类
+Dtimes.innerHTML = store.getState()
+Daddbtn.addEventListener('click', () => {store.dispatch('add')})
+Dsubbtn.addEventListener('click', () => {store.dispatch('sub')})
+
+store.subscribe(() => {
+  Dtimes.innerHTML = store.getState()
 })
 
 
