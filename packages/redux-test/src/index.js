@@ -3,7 +3,8 @@ import { getState, subscribe, add, sub, action } from './redux/test'
 // import { store } from './redux/classial'
 
 // import { store } from './redux/functional'
-import { store } from './redux/functionalIncrease'
+// import { store } from './redux/functionalIncrease'
+import { store } from './redux/functionalIncrease1'
 // import { createStore } from './redux'
 
 function delay(timer = 1000) {
@@ -38,10 +39,10 @@ Dsubbtn.innerHTML = '-1'
 
 // 类
 Dtimes.innerHTML = store.getState()
-Daddbtn.addEventListener('click', () => {store.dispatch1('add')})
-Dsubbtn.addEventListener('click', () => {store.dispatch1('sub')})
+Daddbtn.addEventListener('click', () => {store.dispatch('add')})
+Dsubbtn.addEventListener('click', () => {store.dispatch('sub')})
 Dasyncbtn.addEventListener('click', () => {
-  store.dispatch2(async(d) => {
+  store.dispatch(async(d) => {
     const a = await delay()
     d('add')
   })
