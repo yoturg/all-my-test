@@ -8,7 +8,23 @@ function reducer(state = 1, action) {
   }
 }
 
-function createStore(reducer) {
+function createStore(reducer, logDispatch) {
+  
+  if(typeof logDispatch === 'function') {
+    const store = createStore(reducer)
+
+    // log
+    function dispatch(action) {
+      return logDispatch(store, action)
+    }
+
+    return {
+      ...store,
+      dispatch,
+    }
+  }
+
+
   let state = reducer()
   let listeners = []
 
@@ -42,21 +58,5 @@ function log(store, action) {
   return action
 }
 
-function logCreateStore(createStore, reducer, logDispatch) {
-  const store = createStore(reducer)
-
-  // log
-  function dispatch(action) {
-    return logDispatch(store, action)
-  }
-
-  return {
-    ...store,
-    dispatch,
-  }
-}
-
-const store = logCreateStore(createStore, reducer, log)
+const store = createStore(reducer, log)
 export { store }
-
-
