@@ -1,4 +1,4 @@
-console.log('1.1')
+console.log("1.3")
 function reducer(state = 1, action) {
   if (action === "add") {
     return state + 1
@@ -34,24 +34,23 @@ function createStore(reducer) {
   }
 }
 
-function thunk (store, action) {
-  if(typeof action === 'function') {
+function thunk(store, action) {
+  if (typeof action === "function") {
     return action(store.dispatch)
   }
-  return store.dispatch(action) 
+  return store.dispatch(action)
 }
 
 function log(store, action) {
-  console.group(action);
-  console.log('prev state', store.getState());
-  console.info('dispatching', action);
-  let result = store.dispatch(action);
-  console.log('next state', store.getState());
-  console.groupEnd();
+  console.group(action)
+  console.log("prev state", store.getState())
+  console.info("dispatching", action)
+  let result = store.dispatch(action)
+  console.log("next state", store.getState())
+  console.groupEnd()
 
   return result
 }
-
 
 // function logger(store) {
 //   return function(next) {
@@ -66,8 +65,7 @@ function log(store, action) {
 //   }
 // }
 
-function enhancer (createStore, middleware) {
-
+function enhancer(createStore, middleware) {
   const newCreateStore = (reducer) => {
     const store = createStore(reducer)
 
@@ -77,10 +75,9 @@ function enhancer (createStore, middleware) {
 
     return {
       ...store,
-      dispatch: newDispatch
+      dispatch: newDispatch,
     }
   }
-
 
   return newCreateStore
 }
@@ -89,29 +86,61 @@ function enhancer (createStore, middleware) {
 //   function enhancer(createStore) {
 //     function newCreateStore(reducer) {
 //       const store = createStore(reducer);
-      
+
 //       // 将middleware拿过来执行下，传入store
 //       // 得到第一层函数
 //       const func = middleware(store);
-      
+
 //       // 解构出原始的dispatch
 //       const { dispatch } = store;
-      
+
 //       // 将原始的dispatch函数传给func执行
 //       // 得到增强版的dispatch
 //       const newDispatch = func(dispatch);
-      
+
 //       // 返回的时候用增强版的newDispatch替换原始的dispatch
 //       return {...store, dispatch: newDispatch}
 //     }
-    
+
 //     return newCreateStore;
 //   }
-  
+
 //   return enhancer;
 // }
 
-const store = enhancer(enhancer(createStore, thunk),  log)(reducer)
+// const store = enhancer(enhancer(createStore, thunk), log)(reducer)
+const store = finalCreateStore(reducer)
 export { store }
 
+function finalCreateStore(reducer) {
+  const firstCreate = createStore
+  let store = firstCreate(reducer)
 
+  // thunk
+  const originDispatch = store.dispatch
+  store = {
+    ...store,
+    dispatch: (action) => {
+      if (typeof action === "function") {
+        return action(store.dispatch)
+      }
+      return originDispatch(action) // 原生那个
+    },
+  }
+
+  // log
+  const thunkDispatch = store.dispatch
+  store = {
+    ...store,
+    dispatch: (action) => {
+      console.group(action)
+      console.log("prev state", store.getState())
+      console.info("dispatching", action)
+      let result = thunkDispatch(action) // thunk那个
+      console.log("next state", store.getState())
+      console.groupEnd()
+    },
+  }
+
+  return store
+}

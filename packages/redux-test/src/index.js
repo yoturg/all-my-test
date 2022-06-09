@@ -4,7 +4,8 @@ import { getState, subscribe, add, sub, action } from './redux/test'
 
 // import { store } from './redux/functional'
 // import { store } from './redux/functionalIncrease'
-import { store } from './redux/functionalIncrease1-2'
+// import { store } from './redux/functionalIncrease1-2'
+import { store } from './redux/functionalIncrease1-3'
 // import store from './redux/origin'
 // import { createStore } from './redux'
 
@@ -44,7 +45,7 @@ Dsubbtn.innerHTML = '-1'
 // Dsubbtn.addEventListener('click', () => {store.dispatch({type: 'sub' })})
 // Dasyncbtn.addEventListener('click', () => {
 //   store.dispatch(async(d) => {
-//     const a = await delay()
+//     const a = await delay(2000)
 //     d({type: 'add'})
 //   })
 // })

@@ -11,13 +11,22 @@ const reducer = (state = 1, action) => {
     return state
   }
 }
-// const enhancer = compose( applyMiddleware(...[
-//   thunkMiddleware,
-//   createLogger({})
-// ]) )
+function consoleMiddleware (num) {
+  function createThunkMiddleware(extraArgument) {
+    return ({ dispatch, getState }) => next => action => {
+      console.log(num, "--before")
+      next(action);
+      console.log(num, "--after")
+    };
+  }
+  return createThunkMiddleware()
+}
 const enhancer = compose( applyMiddleware(...[
+  consoleMiddleware(0),
   createLogger({}),
-  thunkMiddleware
+  consoleMiddleware(1),
+  thunkMiddleware,
+  consoleMiddleware(2),
 ]) )
 
 const store = createStore(reducer, enhancer)
