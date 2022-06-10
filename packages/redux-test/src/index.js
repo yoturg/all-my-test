@@ -15,8 +15,6 @@ function delay(timer = 1000) {
   })
 }
 
-
-
 const Dtimes = document.createElement('h1')
 const Daddbtn = document.createElement('button')
 Daddbtn.innerHTML = '+1'
@@ -71,3 +69,4 @@ const Dapp = document.querySelector('#app')
 ;[Dtimes, Daddbtn, Dsubbtn, Dasyncbtn].forEach(v => {
   Dapp.appendChild(v)
 })
+

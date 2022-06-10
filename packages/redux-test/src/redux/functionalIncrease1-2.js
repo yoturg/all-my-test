@@ -1,4 +1,4 @@
-console.log('1.1')
+console.log('1.2')
 function reducer(state = 1, action) {
   if (action === "add") {
     return state + 1

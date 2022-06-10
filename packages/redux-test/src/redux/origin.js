@@ -14,7 +14,10 @@ const reducer = (state = 1, action) => {
 function consoleMiddleware (num) {
   function createThunkMiddleware(extraArgument) {
     return ({ dispatch, getState }) => next => action => {
+      console.log('dispathc', dispatch.toString())
+      console.log('next', next.toString())
       console.log(num, "--before")
+      // dispatch(action)
       next(action);
       console.log(num, "--after")
     };
