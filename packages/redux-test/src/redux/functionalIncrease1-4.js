@@ -28,7 +28,7 @@ function log(store, action) {
 
   return result
 }
-
+// const store = finalCreateStore(reducer)
 const store = enhancerCompose(createStore, [thunk, log])(reducer)
 export { store }
 
@@ -83,3 +83,36 @@ function enhancerCompose(createStore, funcs) {
 }
 
 
+
+function finalCreateStore(reducer) {
+  const firstCreate = createStore
+  let store = firstCreate(reducer)
+
+  // thunk
+  const originDispatch = store.dispatch
+  store = {
+    ...store,
+    dispatch: (action) => {
+      if (typeof action === "function") {
+        return action(store.dispatch)
+      }
+      return originDispatch(action) // 原生那个
+    },
+  }
+
+  // log
+  const thunkDispatch = store.dispatch
+  store = {
+    ...store,
+    dispatch: (action) => {
+      console.group(action)
+      console.log("prev state", store.getState())
+      console.info("dispatching", action)
+      let result = thunkDispatch(action) // thunk那个
+      console.log("next state", store.getState())
+      console.groupEnd()
+    },
+  }
+
+  return store
+}
