@@ -6,3 +6,17 @@
   color: #2c3e50;
   margin-top: 60px;
 }
+
+div {
+  min-width: 50px;
+  min-height: 50px;
+  background: black;
+}
+
+.red {
+  background: red
+}
+
+#gray {
+  background: gray
+}
