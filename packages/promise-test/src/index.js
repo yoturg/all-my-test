@@ -18,7 +18,11 @@ function MyPromise (fn) {
       v(this.PromiseResult)
     })
   }
-  fn(onFulfilled.bind(this), onRejected.bind(this))
+  try {
+    fn(onFulfilled.bind(this), onRejected.bind(this))
+  } catch(e) {
+    onRejected(e)
+  }
 }
 MyPromise.prototype.then = function (fn1, fn2) {
   if(this.PromiseState === 'pending') {
@@ -29,6 +33,7 @@ MyPromise.prototype.then = function (fn1, fn2) {
   } else {
     fn2()
   }
+  return this
 }
 
 
@@ -45,4 +50,8 @@ new MyPromise((resolve, reject) => {
   console.log(111)
 }, res => {
   console.log(222)
+}).then(res => {
+  console.log(333)
+}, e => {
+  console.log(444)
 })
