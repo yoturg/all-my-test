@@ -1,1 +1,1 @@
-import './src/reactv1'
+import './src/reactv2'

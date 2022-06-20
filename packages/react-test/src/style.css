@@ -10,7 +10,7 @@
 div {
   min-width: 50px;
   min-height: 50px;
-  background: black;
+  /* background: black; */
 }
 
 .red {
