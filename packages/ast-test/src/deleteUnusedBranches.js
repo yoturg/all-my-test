@@ -33,7 +33,6 @@ function deleteUnusedBranches(str) {
   traverse(ast, {
     LogicalExpression(path) {
       const { node } = path
-      console.log(path.parent.type)
       const parentType = path.parent.type
       if (node.operator === "&&" && (node.left.name === "__DEV__" || node.right.name === "__DEV__")) {
         if (parentType === "IfStatement") {
@@ -64,8 +63,15 @@ function deleteUnusedBranches(str) {
         if (path.get("alternate").node === null) {
           path.remove()
         } else {
-          const child = path.get("alternate.body")
-          path.replaceWithMultiple(child.map((v) => v.node))
+          let child = path.get("alternate")
+          if (child.type !== "IfStatement") {
+            child = child.get("body")
+          }
+          if (typeof child === "array") {
+            path.replaceWithMultiple(child.map((v) => v.node))
+          } else {
+            path.replaceWith(child)
+          }
         }
       }
     },

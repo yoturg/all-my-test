@@ -2,6 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const deleteUnusedBranches = require('./deleteUnusedBranches')
 
+
+
 ;(async () => {
   try{
     const inputName = path.resolve(__dirname, 'input')
