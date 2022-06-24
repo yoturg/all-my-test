@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const deleteUnusedBranches = require('./deleteUnusedBranches')
+const deleteUnusedBranches = require('./deleteUnusedBranches2')
 
 
 

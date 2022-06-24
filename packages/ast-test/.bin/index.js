@@ -4,7 +4,7 @@ const fs = require('fs')
 const yargs = require("yargs")
 const { argv } = yargs
 
-const deleteUnusedBranches = require('../src/deleteUnusedBranches')
+const deleteUnusedBranches = require('../src/deleteUnusedBranches2')
 
 console.log(argv)
 
