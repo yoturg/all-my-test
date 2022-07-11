@@ -42,7 +42,9 @@ function deleteUnusedBranches(str) {
                 parentPath.replaceWith(left)
               }
 
-              if ((left.type === "BooleanLiteral" && !left.value) || (right.type === "BooleanLiteral" && !right.value)) {
+              if ((left.type === "BooleanLiteral" && !left.value) ||
+                (right.type === "BooleanLiteral" && !right.value)
+              ) {
                 parentPath.replaceWith(t.booleanLiteral(false))
               }
             }
@@ -59,7 +61,9 @@ function deleteUnusedBranches(str) {
                 parentPath.replaceWith(left)
               }
 
-              if ((left.type === "BooleanLiteral" && left.value) || (right.type === "BooleanLiteral" && right.value)) {
+              if ((left.type === "BooleanLiteral" && left.value) ||
+                (right.type === "BooleanLiteral" && right.value)
+              ) {
                 parentPath.replaceWith(t.booleanLiteral(true))
               }
             }
@@ -93,6 +97,7 @@ function deleteUnusedBranches(str) {
             }
             break
         }
+
 
         parentPath = parentPath.parentPath
         if (parentPath === null || parentPath.type === "Program") break
