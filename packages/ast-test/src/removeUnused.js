@@ -16,7 +16,7 @@ async function isDir(p) {
 ;(async () => {
   try {
     const entrance = path.resolve(__dirname, 'input')
-    const dependencyInfos = {}
+
 
     // 读入口文件
     const fileName = path.resolve(entrance, 'ReactFiberWorkLoop.new.js')
@@ -46,6 +46,14 @@ async function isDir(p) {
           })
         }
       },
+      FunctionDeclaration(path) {
+        const { node } = path
+        variable.push(node.id.name)
+      },
+      Program(path) {
+        console.log(path.variables)
+        // console.log(Object.keys(path.scope.bindings))
+      }
     })
     console.log(variable)
   } catch (e) {
