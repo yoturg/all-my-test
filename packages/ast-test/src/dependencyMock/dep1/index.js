@@ -1,7 +1,5 @@
-function aa () {}
+function aa() {}
 
 function bb() {}
 
-export {
-  aa, bb
-}
+export { aa, bb };

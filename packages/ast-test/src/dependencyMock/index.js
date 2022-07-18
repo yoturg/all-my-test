@@ -1,11 +1,11 @@
-import {  bb } from './dep1/index'
-import { cc, dd } from './dep2/index'
+import { bb } from './dep1/index';
+import { cc, dd } from './dep2/index';
 
-const yy = function () {}
+const yy = function () {};
 
-function zz () {
-  bb()
-  cc()
+function zz() {
+  bb();
+  cc();
 }
 
-zz()
+zz();

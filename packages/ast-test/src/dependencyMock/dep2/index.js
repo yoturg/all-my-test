@@ -1,11 +1,9 @@
-import { aa } from '../dep1'
+import { aa } from '../dep1';
 
-function cc () {
-  aa()
+function cc() {
+  aa();
 }
 
 function dd() {}
 
-export {
-  cc, dd
-}
+export { cc, dd };

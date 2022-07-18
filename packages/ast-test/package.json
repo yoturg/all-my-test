@@ -8,6 +8,7 @@
     "dev": "nodemon ./src/index.js"
   },
   "bin": {
+    "rmUnusedVar": "./.bin/rmUnusedVar.js",
     "rmUB": "./.bin/index.js"
   },
   "keywords": [],

@@ -1,62 +1,84 @@
 const fs = require('fs')
+
 const path = require('path')
 
 const babelParser = require('@babel/parser')
+
 const traverse = require('@babel/traverse').default
+
 const generate = require('@babel/generator').default
+
 const t = require('@babel/types')
 
-async function isFile(p) {
-  return await (await fs.statSync(path.resolve(p))).isFile()
-}
-async function isDir(p) {
-  return await (await fs.statSync(path.resolve(p))).isDir()
-}
+function removeUnusedVar(ast) {
+  isChange = false
+  traverse(ast, {
+    ImportDeclaration(path) {
+      const { node } = path
+      const { specifiers } = node
+      if (!specifiers.length) return
+      node.specifiers = specifiers.filter((specifier) => {
+        const { local } = specifier
+        const binding = path.scope.getBinding(local.name)
+        return !!binding?.referenced
+      })
+      if (!node.specifiers.length) path.remove()
+    },
 
-;(async () => {
-  try {
-    const entrance = path.resolve(__dirname, 'input')
-
-
-    // 读入口文件
-    const fileName = path.resolve(entrance, 'ReactFiberWorkLoop.new.js')
-    const str = await fs.readFileSync(fileName)
-    const variable = []
-
-    // 生成抽象树
-    const ast = babelParser.parse(str.toString(), { sourceType: 'module' })
-
-    traverse(ast, {
-      ImportDeclaration(p) {
-        const { node } = p
-        const specifiers = node.specifiers
-        specifiers.forEach((specifier) => {
-          variable.push(specifier.local.name)
-        })
-      },
-      VariableDeclarator(path) {
-        const { node } = path
-        const id = node.id
-        if (id.type === 'Identifier') {
-          variable.push(id.name)
-        }
-        if (id.type === 'ObjectPattern') {
-          id.properties.forEach((property) => {
-            variable.push(property.value.name)
-          })
-        }
-      },
-      FunctionDeclaration(path) {
-        const { node } = path
-        variable.push(node.id.name)
-      },
-      Program(path) {
-        console.log(path.variables)
-        // console.log(Object.keys(path.scope.bindings))
+    FunctionDeclaration(path) {
+      
+      const { node } = path
+      const binding = path.scope.getBinding(node.id.name)
+      if (!binding?.referenced) {
+        path.remove()
+        isChange = true
       }
-    })
-    console.log(variable)
-  } catch (e) {
-    console.log(e)
-  }
-})()
+    },
+
+    VariableDeclaration(path) {
+      const { node } = path
+      const { declarations } = node
+      node.declarations = declarations.filter((declaration) => {
+        const { id } = declaration
+
+        if (t.isObjectPattern(id)) {
+          id.properties = id.properties.filter((property) => {
+            const binding = path.scope.getBinding(property.value.name)
+            if (!binding?.referenced) {
+              isChange = true
+            }
+            return !!binding?.referenced
+          })
+          return !!id.properties.length
+        } else {
+
+          const binding = path.scope.getBinding(id.name)
+          return !!binding?.referenced
+        }
+
+
+      })
+
+      if (!node.declarations.length) {
+        isChange = true
+        path.remove()
+      }
+    },
+  })
+
+  return isChange
+}
+
+module.exports = function removeUnused(str) {
+  let ast = babelParser.parse(str.toString(), {
+    sourceType: 'module',
+  })
+  let removed = false
+
+  do {
+    removed = removeUnusedVar(ast)
+    ast = babelParser.parse(generate(ast).code, { sourceType: 'module' })
+  } while (removed)
+
+  return generate(ast).code
+}
