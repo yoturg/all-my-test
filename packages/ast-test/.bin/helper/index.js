@@ -1,12 +1,14 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 
 async function isFile(p) {
+  if (!p) return false
   return await (await fs.statSync(path.resolve(p))).isFile()
 }
 
 async function isDir(p) {
-  return await (await fs.statSync(path.resolve(p))).isDir()
+  if (!p) return false
+  return await (await fs.statSync(path.resolve(p))).isDirectory()
 }
 
 async function findFiles(dir, deep = false) {
@@ -35,5 +37,5 @@ async function findFiles(dir, deep = false) {
 module.exports = {
   isFile,
   isDir,
-  findFiles
+  findFiles,
 }

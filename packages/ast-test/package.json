@@ -9,6 +9,7 @@
   },
   "bin": {
     "rmUnusedVar": "./.bin/rmUnusedVar.js",
+    "renamedep": "./.bin/renamedep.js",
     "rmUB": "./.bin/index.js"
   },
   "keywords": [],
