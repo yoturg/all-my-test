@@ -8,14 +8,15 @@ const generate = require("@babel/generator").default;
 
 const t = require("@babel/types");
 
-function deleteUnusedBranches(str) {
+function deleteUnusedBranches(str, name, value) {
+  if(typeof value !== "boolean") return 
   const ast = babelParser.parse(str, {
     sourceType: "module"
   });
   traverse(ast, {
     Identifier(path) {
-      if (path.node.name === "__DEV__") {
-        path.replaceWith(t.booleanLiteral(false));
+      if (path.node.name === name) {
+        path.replaceWith(t.booleanLiteral(value));
       }
     }
 

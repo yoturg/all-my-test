@@ -1,63 +1,112 @@
-const fs = require('fs');
+const fs = require('fs')
 
-const path = require("path");
+const nodePath = require('path')
 
-const babelParser = require("@babel/parser");
+const babelParser = require('@babel/parser')
 
-const traverse = require("@babel/traverse").default;
+const traverse = require('@babel/traverse').default
 
-const generate = require("@babel/generator").default;
+const generate = require('@babel/generator').default
 
-const t = require("@babel/types");
+const t = require('@babel/types')
 
-async function isFile(p) {
-  return await (await fs.statSync(path.resolve(p))).isFile();
-}
+function collectionWithFnName(ast, fileName, names) {
+  const dir = nodePath.parse(fileName).dir
+  const res = {}
+  traverse(ast, {
+    FunctionDeclaration(path) {
+      if (names.includes(path.node.id.name)) {
+        const callList = {}
+        path.traverse({
+          CallExpression(p) {
+            const fnName = p.node.callee.name
+            try{
+                const binding = path.scope.getBinding(fnName)
 
-async function isDir(p) {
-  return await (await fs.statSync(path.resolve(p))).isDir();
-}
-
-;
-
-(async () => {
-  try {
-    const entrance = path.resolve(__dirname, 'dependencyMock');
-    const dependencyInfos = {}; // 读入口文件
-
-    const fileName = path.resolve(entrance, 'index.js');
-    const str = await fs.readFileSync(fileName);
-    dependencyInfos[fileName] = dependencyInfos[fileName] || {
-      importList: [],
-      functionList: []
-    }; // 生成抽象树
-
-    const ast = babelParser.parse(str.toString(), {
-      sourceType: "module"
-    });
-    traverse(ast, {
-      ImportDeclaration(p) {
-        const {
-          node
-        } = p;
-        const sourcePath = node.source.value;
-        const specifiers = node.specifiers;
-        let dependencyInfo = dependencyInfos[fileName];
-        const sourceFullPath = path.join(entrance, sourcePath);
-        dependencyInfo.importList.push({
-          path: sourceFullPath,
-          specifiers: specifiers.map(v => {
-            return {
-              exportName: v.imported.name,
-              localName: v.local.name
-            };
-          })
-        });
+                const sourcePath = t.isImportSpecifier(binding?.path) ? 
+                nodePath.join(dir, binding.path.parentPath.node.source.value) :
+                fileName
+                callList[sourcePath] = callList[sourcePath] || []
+                callList[sourcePath].push(fnName)
+            } catch(e) {
+              console.log(e)
+              console.log('++++++++++++++++++++')
+              console.log('names', names)
+              console.log('fileName', fileName)
+              console.log('name', fnName)
+            }
+          },
+        })
+        res[path.node.id.name] = callList
       }
+    },
+  })
+  return res 
+}
 
-    });
-    console.log(JSON.stringify(dependencyInfos));
+function tidy(fileName, fnCache, callList) {
+  // console.log('++++++++++++++++')
+  // console.log('fileName', fileName)
+  // console.log('fnCache', fnCache) 
+  // console.log('callList', callList)
+ 
+
+  Object.keys(callList).forEach(fnName => {
+    const item = callList[fnName]
+    const file = fnCache[fileName] || fnCache[fileName.replace(/\.js$/, '')]
+    if(file && file.hasOwnProperty(fnName)) {
+      file[fnName] = item
+    }
+    Object.keys(item).forEach((v) => {
+      
+      fnCache[v] = fnCache[v] || {}
+      item[v].forEach((val) => {
+        fnCache[v][val] = fnCache[v][val] || null
+      })
+    })
+  })
+}
+
+;(async () => {
+  try {
+    const entrance = nodePath.resolve('/Users/yogurt/workspace/test/react-lego/step4/react-reconciler-new/src/')
+    const fileName = nodePath.resolve(entrance, 'ReactFiberReconciler.js')
+
+    const fnCache = {}
+
+    fnCache[fileName] = { 'updateContainer': null }
+  
+    let isNew = 3
+    while (isNew) {
+      isNew-- 
+      for (let file in fnCache) {
+        const list = Object.keys(fnCache[file]).filter(v => fnCache[file][v] === null)
+        console.log(list)
+        if(list.length) {
+          // isNew = true
+          let str = null
+          try{
+            str = await fs.readFileSync(file)
+          } catch(e){
+            file += '.js'
+            str = await fs.readFileSync(file)
+          }
+          const ast = babelParser.parse(str.toString(), {
+            sourceType: 'module',
+          })
+          const res = collectionWithFnName(ast, file, list)
+
+          tidy(file, fnCache, res)
+        }
+      }
+    }
+    
+
+    // tidy(fnCache, callList)
+
+    console.log('--------', JSON.stringify(fnCache))
+    // console.log(map)
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
-})();
+})()
