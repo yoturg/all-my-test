@@ -3,12 +3,27 @@ const path = require('path')
 
 async function isFile(p) {
   if (!p) return false
-  return await (await fs.statSync(path.resolve(p))).isFile()
+  let obj = null 
+  try {
+    obj = await fs.statSync(path.resolve(p))
+
+  } catch(e){
+    obj = false
+  } finally {
+    return obj ? (await obj.isFile()) : false
+  }
 }
 
 async function isDir(p) {
   if (!p) return false
-  return await (await fs.statSync(path.resolve(p))).isDirectory()
+  let obj = null
+  try {
+    obj = await fs.statSync(path.resolve(p))
+  } catch(e){
+    obj = false
+  } finally {
+    return obj ? (await obj.isDirectory()) : false
+  }
 }
 
 async function findFiles(dir, deep = false) {
