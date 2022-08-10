@@ -15,6 +15,7 @@ const removeUnused = require('../src/removeUnused')
     const files = await fs.readFileSync(v)
     let resString = null
     try {
+      
       resString = removeUnused(files.toString(), v)
     } catch (e) {
       console.log(v)
