@@ -7,11 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/index.js",
     "aa": "node ./src/dependencyCollection.js"
+    
   },
   "bin": {
     "rmUnusedVar": "./.bin/rmUnusedVar.js",
     "renamedep": "./.bin/renamedep.js",
-    "rmUB": "./.bin/index.js"
+    "rmUB": "./.bin/index.js",
+    "collection": "./.bin/collection.js"
   },
   "keywords": [],
   "author": "",

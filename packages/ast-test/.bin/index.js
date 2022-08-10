@@ -15,6 +15,13 @@ async function isDir(p) {
   return await (await fs.statSync(path.resolve(p))).isDir()
 }
 
+/**
+ * 
+ * 查找目录中的文件（广度优先）
+ * @param {*} dir 目录
+ * @param {*} deep 深度
+ * @returns 
+ */
 async function findFiles(dir, deep = false) {
   if (!dir) return []
   if (await isFile(dir)) return [dir]

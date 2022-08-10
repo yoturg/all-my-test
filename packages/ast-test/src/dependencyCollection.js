@@ -113,11 +113,12 @@ function collectionWithFnName(ast, fileName, names) {
 
 function tidy(fileName, fnCache, callList) {
   Object.keys(callList).forEach((fnName) => {
-    const item = callList[fnName]
-    const file = fnCache[fileName] || fnCache[fileName.replace(/\.js$/, '')]
+    const item = callList[fnName] // 拿到当前方法名的依赖列表
+    const file = fnCache[fileName] || fnCache[fileName.replace(/\.js$/, '')] // 拿到fnCache里当前文件的对象
     if (file && file.hasOwnProperty(fnName)) {
       file[fnName] = item
     }
+
     Object.keys(item).forEach((filePath) => {
       fnCache[filePath] = fnCache[filePath] || {}
       item[filePath].forEach((fn) => {
@@ -127,16 +128,10 @@ function tidy(fileName, fnCache, callList) {
   })
 }
 
-;(async () => {
+async function collectionDepend(dir, fnName) {
+  const fnCache = { [dir]: { [fnName]: null } }
+
   try {
-    const entrance = nodePath.resolve('/Users/yogurt/workspace/test/react-lego/step4/react-reconciler-new/src/')
-    const fileName = nodePath.resolve(entrance, 'ReactFiberReconciler.js')
-
-    const fnCache = {}
-
-    fnCache[fileName] = { updateContainer: null }
-
-    // let isNew = 8
     let isNew = true
     while (isNew) {
       isNew = false
@@ -174,14 +169,69 @@ function tidy(fileName, fnCache, callList) {
       }
     }
 
-    // tidy(fnCache, callList)
-
-    console.log('--------', JSON.stringify(fnCache))
-    // console.log(map)
-  } catch (e) {
-    console.log(e)
+    return fnCache
+  } catch (err) {
+    console.log(err)
   }
-})()
+}
+
+module.exports = collectionDepend
+
+// ;(async () => {
+//   try {
+//     const entrance = nodePath.resolve('/Users/yogurt/workspace/test/react-lego/step4/react-reconciler-new/src/')
+//     const fileName = nodePath.resolve(entrance, 'ReactFiberReconciler.js')
+
+//     const fnCache = {}
+
+//     fnCache[fileName] = { updateContainer: null }
+
+//     // let isNew = 3
+//     let isNew = true
+//     while (isNew--) {
+
+//       for (let file in fnCache) {
+//         const list = Object.keys(fnCache[file]).filter((v) => fnCache[file][v] === null)
+//         if (list.length) {
+//           isNew = true
+//           let usedFile = null
+//           if (await isFile(file)) {
+//             usedFile = file
+//           } else {
+//             if (await isDir(file)) {
+//               if (await isFile(file + '/index.js')) {
+//                 usedFile = file + '/index.js'
+//               }
+//             } else {
+//               if (await isFile(file + '.js')) {
+//                 usedFile = file + '.js'
+//               }
+//             }
+//           }
+//           if (usedFile !== file && fnCache[file]) {
+//             fnCache[usedFile] = {...(fnCache[usedFile] || {}), ...fnCache[file]}
+//             delete fnCache[file]
+//           }
+//           // console.log(usedFile)
+//           if (usedFile) {
+//             const str = await fs.readFileSync(usedFile)
+
+//             const ast = babelParser.parse(str.toString(), { sourceType: 'module' })
+//             const res = collectionWithFnName(ast, usedFile, list)
+//             tidy(usedFile, fnCache, res)
+//           }
+//         }
+//       }
+//     }
+
+//     // tidy(fnCache, callList)
+
+//     console.log('--------', JSON.stringify(fnCache))
+//     // console.log(map)
+//   } catch (e) {
+//     console.log(e)
+//   }
+// })()
 
 // ;(async function test() {
 //   const entrance = nodePath.resolve(__dirname, './input/')
