@@ -4,7 +4,7 @@ const babelParser = require('@babel/parser')
 const traverse = require('@babel/traverse').default
 const generate = require('@babel/generator').default
 const t = require('@babel/types')
-const config = require('./input/config1.js')
+const config = require('./input/copy.js')
 const removeUnused = require('./removeUnused')
 
 // function rmExportFlagWhenFnNotInList(ast, list) {

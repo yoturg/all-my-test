@@ -16,20 +16,23 @@ function collectionWithFnName(ast, fileName, names) {
         const callList = {}
         path.traverse({
           CallExpression(p) {
-            const fnName = p.node.callee.name
+           let fnName = p.node.callee.name
             try {
               const binding = path.scope.getBinding(fnName)
               if (binding && binding.path) {
-                const sourcePath = t.isImportSpecifier(binding?.path) ? nodePath.join(dir, binding.path.parentPath.node.source.value) : fileName
+                let sourcePath = fileName
+                if(t.isImportSpecifier(binding.path)) {
+                  fnName = binding.path.node.imported.name
+                  sourcePath = nodePath.join(dir, binding.path.parentPath.node.source.value)
+                }
                 callList[sourcePath] = callList[sourcePath] || []
                 if (!callList[sourcePath].includes(fnName)) {
                   callList[sourcePath].push(fnName)
                 }
+                
               }
             } catch (e) {
-              console.log('names', names)
-              console.log('fileName', fileName)
-              console.log('name', fnName)
+              console.log(e)
             }
           },
           MemberExpression(path) {
@@ -51,6 +54,7 @@ function collectionWithFnName(ast, fileName, names) {
           },
         })
         res[path.node.id.name] = callList
+        
       }
     },
     VariableDeclaration(path) {
@@ -96,6 +100,7 @@ function collectionWithFnName(ast, fileName, names) {
       })
     },
     ExportNamedDeclaration(path) {
+      if(!path.node.source) return
       const specifiers = path.node.specifiers
       specifiers.forEach((specifier) => {
         if (names.includes(specifier.exported.name)) {
@@ -118,6 +123,7 @@ function collectionWithFnName(ast, fileName, names) {
     },
   })
 
+  // console.log(JSON.stringify(res)) 
   // return res
   return Object.assign(
     names.reduce((acc, cur) => {
