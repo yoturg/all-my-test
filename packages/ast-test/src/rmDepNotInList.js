@@ -4,7 +4,7 @@ const babelParser = require('@babel/parser')
 const traverse = require('@babel/traverse').default
 const generate = require('@babel/generator').default
 const t = require('@babel/types')
-const config = require('./input/copy.js')
+const config = require('./input/config.js')
 const removeUnused = require('./removeUnused')
 
 // function rmExportFlagWhenFnNotInList(ast, list) {
@@ -29,21 +29,27 @@ const removeUnused = require('./removeUnused')
 // }
 
 function rmExportFlagWhenFnNotInList(ast, list) {
-
+  console.log('-----')
   traverse(ast, {
     ExportNamedDeclaration(path) {
       if (path.node.specifiers.length) {
         path.get('specifiers').forEach((spec) => {
-          if (!list.includes(spec.node.local.name)) {
+          console.log('list', list)
+          console.log(spec.node.exported.name)
+          if (!list.includes(spec.node.exported.name)) {
             spec.remove()
           }
         })
-      }
-      else if (path.node.declaration && t.isFunctionDeclaration(path.node.declaration)) {
-        console.log(path.node.declaration.id.name)
+      } else if (path.node.declaration && t.isFunctionDeclaration(path.node.declaration)) {
         if (!list.includes(path.node.declaration.id.name)) {
           path.remove()
         }
+      } else if (path.node.declaration && t.isVariableDeclaration(path.node.declaration)) {
+        path.get('declaration.declarations').forEach((declaration) => {
+          if (!list.includes(declaration.node.id.name)) {
+            path.remove()
+          }
+        })
       }
     },
     // FunctionDeclaration(path) {
@@ -59,6 +65,7 @@ function rmExportFlagWhenFnNotInList(ast, list) {
 }
 
 ;(async () => {
+  console.log(config)
   Object.keys(config).forEach(async (filePath) => {
     try {
       const usedFnName = Object.keys(config[filePath])
