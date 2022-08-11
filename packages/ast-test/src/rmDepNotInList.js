@@ -7,28 +7,55 @@ const t = require('@babel/types')
 const config = require('./input/config1.js')
 const removeUnused = require('./removeUnused')
 
+// function rmExportFlagWhenFnNotInList(ast, list) {
+//   console.log(list)
+//   traverse(ast, {
+//     ExportNamedDeclaration(path) {
+
+//       if (path.node.specifiers.length) {
+//         path.get('specifiers').forEach((spec) => {
+//           if (!list.includes(spec.node.local.name)) {
+//             spec.remove()
+//           }
+//         })
+//       } else if (path.node.declaration && t.isFunctionDeclaration(path.node.declaration)) {
+//         console.log(path.node.declaration.id.name)
+//         if (!list.includes(path.node.declaration.id.name)) {
+//           path.remove()
+//         }
+//       }
+//     },
+//   })
+// }
+
 function rmExportFlagWhenFnNotInList(ast, list) {
+
   traverse(ast, {
     ExportNamedDeclaration(path) {
-      if(path.node.specifiers) {
+      if (path.node.specifiers.length) {
         path.get('specifiers').forEach((spec) => {
-          if(!list.includes(spec.node.local.name)) {
+          if (!list.includes(spec.node.local.name)) {
             spec.remove()
           }
         })
       }
-    },
-    FunctionDeclaration(path) {
-      if (!list.includes(path.node.id.name)) {
-        if(t.isExportNamedDeclaration(path.parentPath)) {
-          path.parentPath.remove()
-        } else {
+      else if (path.node.declaration && t.isFunctionDeclaration(path.node.declaration)) {
+        console.log(path.node.declaration.id.name)
+        if (!list.includes(path.node.declaration.id.name)) {
           path.remove()
         }
       }
     },
+    // FunctionDeclaration(path) {
+    //   if (!list.includes(path.node.id.name)) {
+    //     if(t.isExportNamedDeclaration(path.parentPath)) {
+    //       path.parentPath.remove()
+    //     } else {
+    //       path.remove()
+    //     }
+    //   }
+    // },
   })
-
 }
 
 ;(async () => {

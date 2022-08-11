@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const config = require('./input/config.js')
+const config = require('./input/config1.js')
 
 ;(async () => {
   console.log(Object.keys(config))

@@ -32,6 +32,23 @@ function collectionWithFnName(ast, fileName, names) {
               console.log('name', fnName)
             }
           },
+          MemberExpression(path) {
+            if (['bind', 'call', 'apply'].includes(path.node.property.name)) {
+              const fnName = path.node.object.name
+              try {
+                const binding = path.scope.getBinding(fnName)
+                if (binding && binding.path) {
+                  const sourcePath = t.isImportSpecifier(binding?.path) ? nodePath.join(dir, binding.path.parentPath.node.source.value) : fileName
+                  callList[sourcePath] = callList[sourcePath] || []
+                  if (!callList[sourcePath].includes(fnName)) {
+                    callList[sourcePath].push(fnName)
+                  }
+                }
+              } catch (e) {
+                console.log(e)
+              }
+            }
+          },
         })
         res[path.node.id.name] = callList
       }
@@ -154,7 +171,7 @@ async function collectionDepend(dir, fnName) {
             }
           }
           if (usedFile !== file && fnCache[file]) {
-            fnCache[usedFile] = fnCache[file]
+            fnCache[usedFile] = { ...(fnCache[usedFile] || {}), ...fnCache[file] }
             delete fnCache[file]
           }
           // console.log(usedFile)
