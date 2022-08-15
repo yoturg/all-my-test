@@ -52,15 +52,6 @@ function rmExportFlagWhenFnNotInList(ast, list) {
         })
       }
     },
-    // FunctionDeclaration(path) {
-    //   if (!list.includes(path.node.id.name)) {
-    //     if(t.isExportNamedDeclaration(path.parentPath)) {
-    //       path.parentPath.remove()
-    //     } else {
-    //       path.remove()
-    //     }
-    //   }
-    // },
   })
 }
 
