@@ -122,9 +122,6 @@ function collectionWithFnName(ast, fileName, names) {
       })
     },
   })
-
-  // console.log(JSON.stringify(res)) 
-  // return res
   return Object.assign(
     names.reduce((acc, cur) => {
       acc[cur] = {}
