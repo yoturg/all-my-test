@@ -4,6 +4,7 @@ const cp = require('child_process')
 const indexTemp = require('./template/indexTemp')
 const reducerTemp = require('./template/reducerTemp')
 const moduleTemp = require('./template/moduleTemp')
+const hocTemp = require('./template/hocTemp')
 
 const ISTEST = true
 
@@ -68,6 +69,8 @@ module.exports = async (root) => {
   // 创建 reducer.js
   fs.writeFileSync(path.resolve(srcRoot, './store/reducer.js'), reducerTemp, { flag: 'w' })
 
+  // 创建 hoc
+  fs.writeFileSync(path.resolve(srcRoot, './store/hoc.js'), hocTemp, { flag: 'w' })
   // 创建 demo Modal
   fs.writeFileSync(path.resolve(srcRoot, './store/module/test.js'), moduleTemp, { flag: 'w' })
 
