@@ -3,7 +3,7 @@
 	margin: unset;
 	padding: unset;
 }
-#cas {
+#cas, canvas {
 	width: 100%;
 	height: 100vh;
 	/* background: #000; */
