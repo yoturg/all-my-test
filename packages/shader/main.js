@@ -1,4 +1,5 @@
 import Stats from 'stats.js'
+import './util'
 import fs from './fragmentShader.glsl'
 import vs from './vertexShader.glsl'
 
