@@ -4,7 +4,7 @@ window.clamp = function (x, min, max) {
 }
 
 window.smoothstep = function (edge0, edge1, x) {
-  if(edge0 >= edge1) return
+  if (edge0 >= edge1) return
   if (x <= edge0) return 0
   if (x >= edge1) return 1
 
@@ -13,49 +13,70 @@ window.smoothstep = function (edge0, edge1, x) {
 }
 
 window.normalize = function (vec) {
-  const len = Math.sqrt(vec.reduce((acc, cur) => {
-    return acc + cur * cur
-  }, 0))
+  const len = Math.sqrt(
+    vec.reduce((acc, cur) => {
+      return acc + cur * cur
+    }, 0)
+  )
 
-  return vec.map(v => v/len)
+  return vec.map((v) => v / len)
 }
 
-window.dot = function (x,y) {
+window.dot = function (x, y) {
   return x.reduce((acc, cur, idx) => {
-    return acc +  cur * y[idx] 
+    return acc + cur * y[idx]
   }, 0)
 }
 
 window.cross = function (x, y) {
-  return [
-    x[1]*y[2] - y[1]*x[2],
-    x[2]*y[0] - y[2]*x[0],
-    x[0]*y[1] - y[0]*x[1]
-  ]
+  return [x[1] * y[2] - y[1] * x[2], x[2] * y[0] - y[2] * x[0], x[0] * y[1] - y[0] * x[1]]
+}
+
+function permutation(str, times) {
+  const list = Array.from(str)
+  if (times === 1) return list
+  return list.reduce((acc, cur) => {
+    return acc.concat(
+      cur,
+      permutation(str, times - 1).map((newStr) => `${cur}${newStr}`)
+    )
+  }, [])
 }
 
 const keyList = ['xyzw', 'rgba', 'stpq']
 
 function createVec(dim) {
-  const keyMap = keyList.map(v => v.slice(0, dim))
+  const keyMap = permutation('0123'.slice(0, dim), dim)
   return function (...args) {
     const list = Array.prototype.concat.apply([], args)
-    if(list.length !== dim) {
+    if (list.length !== dim) {
       throw new Error('not enough data provided for construction')
     }
+    keyMap.forEach((numStr) => {
+      const numList = Array.from(numStr)
+
+      const keys = keyList.map((originKey) => {
+        return numList.map((idx) => originKey.charAt(idx)).join('')
+      })
+      keys.forEach((key) => {
+        Object.defineProperty(list, key, {
+          enumerable: false,
+          get() {
+            const vec = createVec(numList.length)
+            return vec(numList.map(ind => list[ind]))
+          },
+        })
+      })
+    })
     return list
   }
-
-
 }
-for (let i = 2; i <=4; i++) {
+for (let i = 2; i <= 4; i++) {
   window[`vec${i}`] = createVec(i)
 }
-
 
 window.min = Math.min
 window.max = Math.map
 window.exp = Math.exp
 window.sin = Math.sin
 window.cos = Math.cos
-
