@@ -7,11 +7,65 @@ function main() {
   // Get A WebGL context
   /** @type {HTMLCanvasElement} */
   const canvas = document.querySelector('#canvas')
+  const point = document.querySelector('#point')
   const gl = canvas.getContext('webgl')
   if (!gl) {
     return
   }
 
+  function shaderfn(gl_FragColor, iResolution, iTime) {
+    return `${gl_FragColor.x}, ${gl_FragColor.y}`
+  }
+
+  function moveEventHandler(e) {
+    let x = 0, y = 0
+    console.log(e)
+    if(e.type === 'mousemove') {
+      x = e.x
+      y = e.y
+    } else {
+      x = e.changedTouches[0].pageX
+      y = e.changedTouches[0].pageY
+    }
+
+    x = Math.floor(x)
+    y = Math.floor(y)
+
+    const pageWidth = innerWidth
+    const pageHeight = innerHeight
+
+    const pointWidth = point.offsetWidth
+    const pointHeight = point.offsetHeight
+
+    let top = y
+    let left = x
+    if(x + pointWidth >= pageWidth - 10) {
+      left -=   pointWidth
+    }
+    if(y + pointHeight >= pageHeight - 10) {
+      top -= pointHeight
+    }
+
+    point.style.top = top + 'px'
+    point.style.left = left + 'px'
+
+    point.innerText = `${x}, ${y}`
+    e.stopPropagation()
+  }
+
+  function endEventHandler (e) {
+
+    point.style.top = 'unset'
+    point.style.left = 'unset'
+  }
+
+
+
+  canvas.addEventListener('mousemove', moveEventHandler)
+  canvas.addEventListener('touchmove', moveEventHandler)
+  
+  canvas.addEventListener('mouseup', endEventHandler)
+  canvas.addEventListener('touchend', endEventHandler)
 
 
   // setup GLSL program
@@ -56,7 +110,7 @@ function main() {
 
   const stats = new Stats()
   stats.showPanel(0)
-  document.body.appendChild(stats.dom)
+  // document.body.appendChild(stats.dom)
 
   let requestId
   function requestFrame() {
@@ -108,6 +162,9 @@ function main() {
 
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
     gl.uniform2f(mouseLocation, mouseX, mouseY)
+    window.iTime = time
+    console.log('time', time)
+
     gl.uniform1f(timeLocation, time)
 
     gl.drawArrays(
@@ -118,6 +175,7 @@ function main() {
 
     requestFrame()
   }
+
 
   requestFrame()
   requestAnimationFrame(cancelFrame)

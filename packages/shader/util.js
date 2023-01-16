@@ -20,12 +20,38 @@ window.normalize = function (vec) {
   return vec.map(v => v/len)
 }
 
-function vec(...args) {
-  return Array.prototype.concat.apply([], args)
+window.dot = function (x,y) {
+  return x.reduce((acc, cur, idx) => {
+    return acc +  cur * y[idx] 
+  }, 0)
 }
-window.vec2 = vec
-window.vec3 = vec
-window.vec4 = vec
+
+window.cross = function (x, y) {
+  return [
+    x[1]*y[2] - y[1]*x[2],
+    x[2]*y[0] - y[2]*x[0],
+    x[0]*y[1] - y[0]*x[1]
+  ]
+}
+
+const keyList = ['xyzw', 'rgba', 'stpq']
+
+function createVec(dim) {
+  const keyMap = keyList.map(v => v.slice(0, dim))
+  return function (...args) {
+    const list = Array.prototype.concat.apply([], args)
+    if(list.length !== dim) {
+      throw new Error('not enough data provided for construction')
+    }
+    return list
+  }
+
+
+}
+for (let i = 2; i <=4; i++) {
+  window[`vec${i}`] = createVec(i)
+}
+
 
 window.min = Math.min
 window.max = Math.map

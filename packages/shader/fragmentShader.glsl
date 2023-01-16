@@ -51,11 +51,10 @@ vec2 map(vec3 p) {
 
 vec4 render(in vec3 ro, in vec3 rd) {
   vec4 rez = vec4(0); // vec4(0, 0, 0, 0)
-  const float ldst = 8.;
 
   float t = 1.5;
   float fogT = 0.;
-  for(int i = 0; i < 130; i++) {
+  for(int i = 0; i < 1; i++) {
     if(rez.a > 0.99)
       break;
 
@@ -76,6 +75,7 @@ vec4 render(in vec3 ro, in vec3 rd) {
 
     float fogC = exp(t * 0.2 - 2.2);
     col.rgba += vec4(0.06, 0.11, 0.11, 0.1) * clamp(fogC - fogT, 0., 1.);
+
     fogT = fogC;
     rez = rez + col * (1. - rez.a);
     t += clamp(0.5 - dn * dn * .05, 0.09, 0.3);
@@ -95,9 +95,9 @@ void mainImage(out vec4 fragColor) {
   // vec3 target = normalize(ro - vec3(0.0, 0.0, time + tgtDst));
   vec3 target = normalize(vec3(0., 0., -tgtDst)); // vec3(0, 0, -1)
 
-  vec3 rightdir = normalize(cross(target, vec3(0, 1, 0))); // vec3(-1, 0, 0)
+  vec3 rightdir = normalize(cross(target, vec3(0, 1, 0))); // vec3(1, 0, 0)
   vec3 updir = normalize(cross(rightdir, target)); // vec3(0, 1, 0)
-  rightdir = normalize(cross(updir, target)); // vec3(1, 0, 0)
+  rightdir = normalize(cross(updir, target)); // vec3(-1, 0, 0)
   vec3 rd = normalize((p.x * rightdir + p.y * updir) * 1. - target); // 重新映射x，y到新的坐标体系里，然后算出方向向量
 
   prm1 = smoothstep(-0.4, 0.4, sin(iTime * 0.3)); // 一个0到1的值，有效周期是sin周期的三倍
