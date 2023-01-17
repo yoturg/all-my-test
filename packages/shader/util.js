@@ -3,7 +3,7 @@ const radians = function (deg) {
 }
 
 const degrees = function (rad) {
-  return(180 / Math.PI) * deg
+  return (180 / Math.PI) * deg
 }
 
 const clamp = function (x, min, max) {
@@ -116,6 +116,13 @@ function createVec(dim) {
 
       return result
     }
+    list.sub = function (num) {
+      if (typeof num === 'number') {
+        return list.add(-1 * num)
+      } else if (num.type === 'vec') {
+        return list.add(num.mult(-1))
+      }
+    }
     list.mult = function (num) {
       const result = createVec(dim)(this)
       if (typeof num === 'number') {
@@ -129,6 +136,13 @@ function createVec(dim) {
       }
       return result
     }
+
+    list.divide = function (num) {
+      if (typeof num === 'number') {
+        return list.mult(1 / num)
+      }
+    }
+
     list.type = 'vec'
     list.dim = dim
     return list
@@ -194,7 +208,7 @@ window.tan = Math.tan
 window.asin = Math.asin
 window.acos = Math.acos
 window.atan = function (...args) {
-  if(args.length === 1) {
+  if (args.length === 1) {
     Math.atan(...args)
   } else {
     Math.atan2(...args.slice(0, 2))

@@ -16,5 +16,7 @@ body {
 	background: #fff;
 	color: #000;
 	position: absolute;
-
+	will-change: auto;
+	pointer-events: none;
+	margin: 10px;
 }

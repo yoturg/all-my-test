@@ -13,23 +13,29 @@ function main() {
     return
   }
 
-  function shaderfn(gl_FragColor, iResolution, iTime) {
-    return `${gl_FragColor.x}, ${gl_FragColor.y}`
+  function shaderfn(gl_FragCoord, iResolution, iTime) {
+    const tgtDst = 3.5
+
+    const p = gl_FragCoord.xy.sub(iResolution.xy.mult(0.5)).divide(min(iResolution.y, iResolution.x))
+
+    const target = normalize(vec3(0, 0, -tgtDst))
+    // const p = (gl_FragCoord.xy - 0.5 * iResolution.xy) / min(iResolution.y, iResolution.x)
+
+    const time = iTime * 3
+    const ro = vec3(0, 0, time)
+    return p
   }
 
   function moveEventHandler(e) {
-    let x = 0, y = 0
-    console.log(e)
-    if(e.type === 'mousemove') {
+    let x = 0,
+      y = 0
+    if (e.type === 'mousemove') {
       x = e.x
       y = e.y
     } else {
       x = e.changedTouches[0].pageX
       y = e.changedTouches[0].pageY
     }
-
-    x = Math.floor(x)
-    y = Math.floor(y)
 
     const pageWidth = innerWidth
     const pageHeight = innerHeight
@@ -39,34 +45,31 @@ function main() {
 
     let top = y
     let left = x
-    if(x + pointWidth >= pageWidth - 10) {
-      left -=   pointWidth
+    if (x + pointWidth >= pageWidth - 10) {
+      left -= pointWidth
     }
-    if(y + pointHeight >= pageHeight - 10) {
+    if (y + pointHeight >= pageHeight - 10) {
       top -= pointHeight
     }
 
     point.style.top = top + 'px'
     point.style.left = left + 'px'
 
-    point.innerText = `${x}, ${y}`
+    const res = shaderfn(vec2(x, y), vec2(pageWidth, pageHeight), iTime)
+    point.innerText = `${res.x}, ${res.y}`
     e.stopPropagation()
   }
 
-  function endEventHandler (e) {
-
+  function endEventHandler(e) {
     point.style.top = 'unset'
     point.style.left = 'unset'
   }
 
-
-
   canvas.addEventListener('mousemove', moveEventHandler)
   canvas.addEventListener('touchmove', moveEventHandler)
-  
+
   canvas.addEventListener('mouseup', endEventHandler)
   canvas.addEventListener('touchend', endEventHandler)
-
 
   // setup GLSL program
   const program = webglUtils.createProgramFromSources(gl, [vs, fs])
@@ -163,7 +166,6 @@ function main() {
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
     gl.uniform2f(mouseLocation, mouseX, mouseY)
     window.iTime = time
-    console.log('time', time)
 
     gl.uniform1f(timeLocation, time)
 
@@ -175,7 +177,6 @@ function main() {
 
     requestFrame()
   }
-
 
   requestFrame()
   requestAnimationFrame(cancelFrame)
