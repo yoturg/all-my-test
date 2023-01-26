@@ -200,7 +200,7 @@ window.normalize = normalize
 window.clamp = clamp
 
 window.min = Math.min
-window.max = Math.map
+window.max = Math.max
 window.exp = Math.exp
 window.sin = Math.sin
 window.cos = Math.cos
