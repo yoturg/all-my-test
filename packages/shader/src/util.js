@@ -8,7 +8,14 @@ const degrees = function (rad) {
 
 const clamp = function (x, min, max) {
   if (min > max) return
-  return Math.min(Math.max(x, min), max)
+  if (x.type === 'vec') {
+    for (let i = 0; i < x.dem; i++) {
+      x[i] = Math.min(Math.max(x[i], min), max)
+    }
+    return x
+  } else {
+    return Math.min(Math.max(x, min), max)
+  }
 }
 
 const smoothstep = function (edge0, edge1, x) {
@@ -27,7 +34,8 @@ const normalize = function (vec) {
     }, 0)
   )
 
-  return vec.map((v) => v / len)
+  // return vec.map((v) => v / len)
+  return vec.mult(1 / len)
 }
 
 const dot = function (x, y) {
@@ -37,7 +45,7 @@ const dot = function (x, y) {
 }
 
 const cross = function (x, y) {
-  return [x[1] * y[2] - y[1] * x[2], x[2] * y[0] - y[2] * x[0], x[0] * y[1] - y[0] * x[1]]
+  return vec3([x[1] * y[2] - y[1] * x[2], x[2] * y[0] - y[2] * x[0], x[0] * y[1] - y[0] * x[1]])
 }
 
 function permutation(str, times) {
@@ -168,7 +176,9 @@ function createMat(dim) {
       throw new Error('not enough data provided for construction')
     }
     list.mult = function (args) {
-      if (args.type === 'vec' && args.dim === dim) {
+      if (typeof args === 'number') {
+        return this.map((vec) => vec.mult(args))
+      } else if (args.type === 'vec' && args.dim === dim) {
         const m = this
         const v = args
 
@@ -207,6 +217,7 @@ window.cos = Math.cos
 window.tan = Math.tan
 window.asin = Math.asin
 window.acos = Math.acos
+window.abs = Math.abs
 window.atan = function (...args) {
   if (args.length === 1) {
     Math.atan(...args)

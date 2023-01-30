@@ -4,9 +4,8 @@ uniform vec2 iResolution;
 uniform float iLimit;
 
 void main(){
-  // gl_PointSize=5.;
+  vec2 newResolution = vec2(iLimit, iLimit * (iResolution.y / iResolution.x));
   vec4 newPos = a_position;
-  newPos.x /= iLimit;
-  newPos.y /= iLimit;
+  newPos.xy = newPos.xy / newResolution;
   gl_Position= newPos;
 }

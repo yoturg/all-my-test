@@ -2,6 +2,8 @@ import Stats from 'stats.js'
 import '../util'
 import fs from './fragmentShader.glsl'
 import vs from './vertexShader.glsl'
+import shaderfn from './shaderfn'
+import webglUtils from '../webgl-utils'
 
 export default function (canvas) {
   const gl = canvas.getContext('webgl')
@@ -9,18 +11,7 @@ export default function (canvas) {
     return
   }
 
-  function shaderfn(gl_FragCoord, iResolution, iTime) {
-    const tgtDst = 3.5
 
-    const p = gl_FragCoord.xy.sub(iResolution.xy.mult(0.5)).divide(min(iResolution.y, iResolution.x))
-
-    const target = normalize(vec3(0, 0, -tgtDst))
-    // const p = (gl_FragCoord.xy - 0.5 * iResolution.xy) / min(iResolution.y, iResolution.x)
-
-    const time = iTime * 3
-    const ro = vec3(0, 0, time)
-    return p
-  }
 
   function moveEventHandler(e) {
     let x = 0,
@@ -51,8 +42,8 @@ export default function (canvas) {
     point.style.top = top + 'px'
     point.style.left = left + 'px'
 
-    const res = shaderfn(vec2(x, y), vec2(pageWidth, pageHeight), iTime)
-    point.innerText = `${res.x}, ${res.y}`
+    const res = shaderfn(vec2(x, y), vec2(pageWidth, pageHeight), window.iTime)
+    point.innerText = JSON.stringify(res).replaceAll(',', ',\n')
     e.stopPropagation()
   }
 
@@ -115,7 +106,7 @@ export default function (canvas) {
   function requestFrame() {
     if (!requestId) {
       stats.begin()
-      requestId = requestAnimationFrame(render)
+      requestId = requestAnimationFrame(render2)
       stats.end()
     }
   }
@@ -128,7 +119,7 @@ export default function (canvas) {
 
   let then = 0
   let time = 0
-  function render(now) {
+  function render2(now) {
     requestId = undefined
     now *= 0.001 // convert to seconds
     const elapsedTime = Math.min(now - then, 0.1)
@@ -177,5 +168,3 @@ export default function (canvas) {
   requestFrame()
   requestAnimationFrame(cancelFrame)
 }
-
-

@@ -34,18 +34,20 @@ vec2 map(vec3 p) {
   p.xy *= rot(sin(p.z + iTime) * (0.1 + prm1 * 0.05) + iTime * 0.09); // 对原向量进行了旋转
   float cl = mag2(p2.xy); // p2向量模的平方
   float d = 0.;
-  p *= .61; // 放大0.61倍
+  // p *= .61; // 放大0.61倍
   float z = 1.;
   float trk = 1.;
   float dspAmp = 0.1 + prm1 * 0.2; // 0.1 ～ 0.3
-  // for(int i = 0; i < 1; i++) {
-  //   p += sin(p.zxy * 0.75 * trk + iTime * trk * .8) * dspAmp;
-  //   d -= abs(dot(cos(p), sin(p.yzx)) * z);
-  //   z *= 0.57;
-  //   trk *= 1.4;
-  //   p = p * m3;
-  // }
-  d = abs(d + prm1 * 3.) + prm1 * .3 - 2.5;
+
+  for(int i = 0; i < 1; i++) {
+    p += sin(p.zxy * 0.75 * trk + iTime * trk * .8) * dspAmp;
+    d -= abs(dot(cos(p), sin(p.yzx)) * z);
+    z *= 0.57;
+    trk *= 1.4;
+    p = p * m3;
+  }
+
+  d = abs(d + prm1 * 3.) - 2.5;
   return vec2(d + cl * .2 + 0.25, cl);
 }
 
@@ -54,7 +56,7 @@ vec4 render(in vec3 ro, in vec3 rd) {
 
   float t = 1.5;
   float fogT = 0.;
-  for(int i = 0; i < 1; i++) {
+  for(int i = 0; i < 130; i++) {
     if(rez.a > 0.99)
       break;
 
@@ -74,7 +76,7 @@ vec4 render(in vec3 ro, in vec3 rd) {
     // }
 
     float fogC = exp(t * 0.2 - 2.2);
-    col.rgba += vec4(0.06, 0.11, 0.11, 0.1) * clamp(fogC - fogT, 0., 1.);
+    col = vec4(0.06, 0.11, 0.11, 0.1) * clamp(fogC - fogT, 0., 1.);
 
     fogT = fogC;
     rez = rez + col * (1. - rez.a);
@@ -98,7 +100,7 @@ void mainImage(out vec4 fragColor) {
   vec3 rightdir = normalize(cross(target, vec3(0, 1, 0))); // vec3(1, 0, 0)
   vec3 updir = normalize(cross(rightdir, target)); // vec3(0, 1, 0)
   rightdir = normalize(cross(updir, target)); // vec3(-1, 0, 0)
-  vec3 rd = normalize((p.x * rightdir + p.y * updir) * 1. - target); // 重新映射x，y到新的坐标体系里，然后算出方向向量
+  vec3 rd = normalize((p.x * rightdir + p.y * updir) - target); // 重新映射x，y到新的坐标体系里，然后算出方向向量
 
   prm1 = smoothstep(-0.4, 0.4, sin(iTime * 0.3)); // 一个0到1的值，有效周期是sin周期的三倍
   vec4 scn = render(ro, rd);
@@ -110,8 +112,9 @@ void mainImage(out vec4 fragColor) {
   // col = pow(col, vec3(.55,0.65,0.6))*vec3(1.,.97,.9);
 
   // col *= pow( 16.0*q.x*q.y*(1.0-q.x)*(1.0-q.y), 0.12)*0.7+0.3; //Vign
-
-  fragColor = vec4(col, 1.0);
+  fragColor = vec4(col.rgb, 1.);
+  fragColor = vec4(col.x, 0, 0, 1.0);
+  fragColor = vec4(0, col.y, 0, 1.0);
 }
 
 void main() {
