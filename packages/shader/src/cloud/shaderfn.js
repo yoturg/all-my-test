@@ -2,6 +2,11 @@ import '../util'
 
 let iTime = 0
 let prm1 = 0
+let m3 = mat3(
+  0.33338, 0.56034, -0.71817, 
+  -0.87887, 0.32651, -0.15323, 
+  0.15162, 0.69596, 0.61339
+).mult(1.93) ;
 function rot(a) {
   let c = cos(a),
     s = sin(a)
@@ -27,9 +32,26 @@ function map(p) {
 }
 
 function map2(p) {
+  let p2 = vec3(p)
 
-  p.xy = rot(sin(p.z + iTime) * (0.1 + prm1 * 0.05) + iTime * 0.09).mult(p.xy)
-  return p
+  // p.xy = rot(sin(p.z + iTime) * (0.1 + prm1 * 0.05) + iTime * 0.09).mult(p.xy)
+
+  let cl = mag2(p2.xy)
+  let d = 0
+  let z = 1
+  let trk = 1
+  let dspAmp = 0.1 + prm1 * 0.2
+
+  for (let i = 0; i < 1; i++) {
+    p = p.add(sin(p.zxy.mult(0.75 * trk).add(iTime * trk * 0.8)).mult(dspAmp))
+    d -= abs(dot(cos(p), sin(p.yzx)) * z)
+    z *= 0.57
+    trk *= 1.4
+    p = m3.mult(p);
+  }
+
+  d = abs(d + prm1 * 3) - 2.5
+  return {mapp: p, cl}
 }
 
 function render(ro, rd) {
@@ -37,7 +59,6 @@ function render(ro, rd) {
 
   let t = 1.5
   let fogT = 0
-
 
   for (let i = 0; i < 60; i++) {
     if (rez.a > 0.99) break
@@ -49,7 +70,6 @@ function render(ro, rd) {
 
     let mpv = map(pos)
 
-
     let dn = clamp(mpv.x + 2, 0, 3)
 
     let col = vec4(0)
@@ -59,14 +79,13 @@ function render(ro, rd) {
     col = col.rgba.add(vec4(0.06, 0.11, 0.11, 0.1).mult(clamp(fogC - fogT, 0, 1)))
 
     fogT = fogC
-    rez = rez.add(col.mult(1-rez.a))
+    rez = rez.add(col.mult(1 - rez.a))
     t += clamp(0.5 - dn * dn * 0.05, 0.09, 0.3)
   }
 
   // return clamp(rez, 0.0, 1.0)
   return map2(ro.add(rd.mult(t)))
 }
-
 
 export default function shaderfn(gl_FragCoord, iResolution, itime) {
   iTime = itime
@@ -90,5 +109,5 @@ export default function shaderfn(gl_FragCoord, iResolution, itime) {
 
   let scn = render(ro, rd)
 
-  return { p, scn, prm1, rd }
+  return { p, ...scn, prm1, rd }
 }

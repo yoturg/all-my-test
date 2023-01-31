@@ -1,3 +1,5 @@
+const vecs = {}
+const mats = {}
 const radians = function (deg) {
   return (Math.PI / 180) * deg
 }
@@ -104,14 +106,14 @@ function createVec(dim) {
             if (numList.length === 1) {
               return list[numList[0]]
             }
-            const vec = createVec(numList.length)
+            const vec = vecs[numList.length]
             return vec(numList.map((ind) => list[ind]))
           },
         })
       })
     })
     list.add = function (num) {
-      const result = createVec(dim)(this)
+      const result = vecs[dim](this)
       if (typeof num === 'number') {
         result.forEach((v, i) => {
           result[i] += num
@@ -132,7 +134,7 @@ function createVec(dim) {
       }
     }
     list.mult = function (num) {
-      const result = createVec(dim)(this)
+      const result = vecs[dim](this)
       if (typeof num === 'number') {
         result.forEach((v, i) => {
           result[i] *= num
@@ -158,7 +160,7 @@ function createVec(dim) {
 }
 
 function createMat(dim) {
-  const vec = createVec(dim)
+  const vec = vecs[dim]
   return function (...args) {
     let list = new Array(dim).fill(null)
     if (args.length === 1) {
@@ -166,6 +168,10 @@ function createMat(dim) {
         const vector = vec(0)
         vector[i] = args[0]
         return vector
+      })
+    } else if (args.length === dim && args.every(v => v.type === 'vec')) {
+      list = list.map((_, i) => {
+        return args[i]
       })
     } else if (args.length === dim * dim) {
       list = list.map((_, i) => {
@@ -177,7 +183,7 @@ function createMat(dim) {
     }
     list.mult = function (args) {
       if (typeof args === 'number') {
-        return this.map((vec) => vec.mult(args))
+        return mats[this.dim](...this.map((vec) => vec.mult(args)))
       } else if (args.type === 'vec' && args.dim === dim) {
         const m = this
         const v = args
@@ -200,7 +206,9 @@ function createMat(dim) {
 }
 for (let i = 2; i <= 4; i++) {
   window[`vec${i}`] = createVec(i)
+  vecs[i] = createVec(i)
   window[`mat${i}`] = createMat(i)
+  mats[i] = createMat(i)
 }
 
 window.smoothstep = smoothstep
@@ -209,15 +217,26 @@ window.dot = dot
 window.normalize = normalize
 window.clamp = clamp
 
-window.min = Math.min
-window.max = Math.max
-window.exp = Math.exp
-window.sin = Math.sin
-window.cos = Math.cos
-window.tan = Math.tan
+function mathHacker(fn) {
+  return function (args) {
+    if (args.type === 'vec') {
+      args.map((v) => fn(v))
+      return vecs[args.dim](args)
+    } else {
+      return fn(args)
+    }
+  }
+}
+
+window.min = mathHacker(Math.min)
+window.max = mathHacker(Math.max)
+window.exp = mathHacker(Math.exp)
+window.sin = mathHacker(Math.sin)
+window.cos = mathHacker(Math.cos)
+window.tan = mathHacker(Math.tan)
+window.abs = mathHacker(Math.abs)
 window.asin = Math.asin
 window.acos = Math.acos
-window.abs = Math.abs
 window.atan = function (...args) {
   if (args.length === 1) {
     Math.atan(...args)
@@ -225,3 +244,16 @@ window.atan = function (...args) {
     Math.atan2(...args.slice(0, 2))
   }
 }
+
+
+// TODO 写个自动转换加减乘除的表达式树
+window.test = (s) => {
+  // const ss = '2 * 8 + (2 - 1) * 3 / 5 * 2 '.replace(/\s+/g, '')
+  const numList = []
+  const ss = '2 * 8 + 3 / 5 * 2 '.replace(/\s+/g, '')
+ 
+  let res = ss
+  return  res
+}
+
+console.log(test())

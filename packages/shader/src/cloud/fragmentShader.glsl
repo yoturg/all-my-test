@@ -9,11 +9,12 @@ mat2 rot(in float a) {
   float c = cos(a), s = sin(a);
   return mat2(c, s, -s, c);
 }
+
 const mat3 m3 = mat3(
   0.33338, 0.56034, -0.71817, 
   -0.87887, 0.32651, -0.15323, 
   0.15162, 0.69596, 0.61339
-) * 1.93;
+)*1.93;
 
 /*
 ** 让一个二维向量自己点乘自己，也就是模的平方
@@ -31,18 +32,18 @@ float prm1 = 0.;
 vec2 map(vec3 p) {
   vec3 p2 = p; // 入参的向量
 
-  p.xy *= rot(sin(p.z + iTime) * (0.1 + prm1 * 0.05) + iTime * 0.09); // 对原向量进行了旋转
+  // p.xy *= rot(sin(p.z + iTime) * (0.1 + prm1 * 0.05) + iTime * 0.09); // 对原向量进行了旋转
   float cl = mag2(p2.xy); // p2向量模的平方
   float d = 0.;
   // p *= .61; // 放大0.61倍
   float z = 1.;
   float trk = 1.;
   float dspAmp = 0.1 + prm1 * 0.2; // 0.1 ～ 0.3
-
-  for(int i = 0; i < 1; i++) {
+  // d -= abs(dot(cos(p.x), sin(p.y)) * z);  
+  for(int i = 0; i < 5; i++) {
     p += sin(p.zxy * 0.75 * trk + iTime * trk * .8) * dspAmp;
-    d -= abs(dot(cos(p), sin(p.yzx)) * z);
-    z *= 0.57;
+    // d -= abs(dot(cos(p.x), sin(p.y)) * z);
+    z *= 0.17;
     trk *= 1.4;
     p = p * m3;
   }
