@@ -169,7 +169,7 @@ function createMat(dim) {
         vector[i] = args[0]
         return vector
       })
-    } else if (args.length === dim && args.every(v => v.type === 'vec')) {
+    } else if (args.length === dim && args.every((v) => v.type === 'vec')) {
       list = list.map((_, i) => {
         return args[i]
       })
@@ -245,15 +245,43 @@ window.atan = function (...args) {
   }
 }
 
-
 // TODO 写个自动转换加减乘除的表达式树
 window.test = (s) => {
   // const ss = '2 * 8 + (2 - 1) * 3 / 5 * 2 '.replace(/\s+/g, '')
   const numList = []
   const ss = '2 * 8 + 3 / 5 * 2 '.replace(/\s+/g, '')
- 
+
   let res = ss
-  return  res
+  return res
 }
 
 console.log(test())
+
+window.dataURLtoBlob = function dataURLtoBlob(dataurl) {
+  const arr = dataurl.split(',')
+  const mime = arr[0].match(/:(.*?);/)[1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new Blob([u8arr], { type: mime })
+}
+
+// 将blob转换为file
+window.blobToFile = function blobToFile(theBlob, fileName) {
+  console.log('二进制转对象')
+  theBlob.lastModifiedDate = new Date()
+  theBlob.name = fileName
+  return theBlob
+}
+
+
+window.downLoad = function (blob) {
+  const link = document.createElement('a');
+  const objurl = URL.createObjectURL(blob)
+  link.download = 'aa.png';
+  link.href = objurl
+  link.click()  
+}

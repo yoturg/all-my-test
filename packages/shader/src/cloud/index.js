@@ -5,13 +5,23 @@ import vs from './vertexShader.glsl'
 import shaderfn from './shaderfn'
 import webglUtils from '../webgl-utils'
 
+const saveBlob = (function () {
+  const a = document.createElement('a')
+  document.body.appendChild(a)
+  a.style.display = 'none'
+  return function saveData(blob, fileName) {
+    const url = window.URL.createObjectURL(blob)
+    a.href = url
+    a.download = fileName
+    a.click()
+  }
+})()
+
 export default function (canvas) {
   const gl = canvas.getContext('webgl')
   if (!gl) {
     return
   }
-
-
 
   function moveEventHandler(e) {
     let x = 0,
@@ -115,6 +125,13 @@ export default function (canvas) {
       cancelAnimationFrame(requestId)
       requestId = undefined
     }
+  }
+
+  window.save = function () {
+    render2()
+    canvas.toBlob((blob) => {
+      saveBlob(blob, `screencapture-${canvas.width}x${canvas.height}.png`);
+    });
   }
 
   let then = 0
